@@ -1174,6 +1174,10 @@ void dump_stack(const thread_list& threads) {
   }
 
   for (size_t i = 0; i < threads.size(); ++i) {
+    if (thread_tid > 0 && thread_tid != threads[i].tid) {
+       continue;
+    }
+
     if (fails[i] == false) {
       if (single_line) {
         const size_t name_width =
@@ -1280,10 +1284,10 @@ static void usage_exit() {
       "during taking all stack traces, so stall time is slightly increased, "
       "but will give more accurate results.\n");
   printf(
-      " -i, --thread_id=TID        :Only print thread TID with full stack info"
+      " -i, --thread_id=TID            :Only print thread TID with full stack info"
       "Default is print all threads stack with simplified stack info\n");
   printf(
-      " -q, --line_num=N        :Print top N call stack with line num "
+      " -q, --line_num=N               :Print top N call stack with line num "
       "Default is no line number displayed for fast dump\n");
   exit(1);
 }
@@ -1291,7 +1295,7 @@ static void usage_exit() {
 static void get_options(int argc, char** argv) {
   int c, opt_ind = 0;
   while ((c = getopt_long(
-              argc, argv, "?absnflvw:k:d:c:t:p:o:", long_options, &opt_ind)) !=
+              argc, argv, "?absnflvw:k:d:c:t:p:o:i:q:", long_options, &opt_ind)) !=
          EOF) {
     switch (c) {
     case '?':
