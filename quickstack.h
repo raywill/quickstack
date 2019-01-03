@@ -35,6 +35,8 @@ using std::string;
 using std::vector;
 using std::map;
 
+#define nullptr NULL
+
 // From binutils/include/demangle.h
 #define DMGL_PARAMS (1 << 0) /* Include function args */
 #define DMGL_ANSI (1 << 1) /* Include const, volatile, etc */
@@ -191,7 +193,7 @@ typedef struct stopper_symbol {
 
 typedef struct thread_info {
   thread_info(const int tid) : tid(tid) {
-    const string file_path = "/proc/" + std::to_string(tid) + "/comm";
+    const string file_path = "/proc/" + std::to_string(static_cast<long long int>(tid)) + "/comm";
     std::ifstream comm_file(file_path);
     if (comm_file.is_open()) {
       std::getline(comm_file, name);
