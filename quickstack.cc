@@ -1284,10 +1284,10 @@ static void usage_exit() {
       "during taking all stack traces, so stall time is slightly increased, "
       "but will give more accurate results.\n");
   printf(
-      " -i, --thread_id=TID            :Only print thread TID with full stack info"
+      " -i, --thread_id=TID            :Only print thread TID with full stack info. "
       "Default is print all threads stack with simplified stack info\n");
   printf(
-      " -q, --line_num=N               :Print top N call stack with line num "
+      " -q, --line_num=N               :Print top N call stack with line num. "
       "Default is no line number displayed for fast dump\n");
   exit(1);
 }
