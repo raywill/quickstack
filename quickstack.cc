@@ -26,6 +26,8 @@ int target_pid = 0;
 int debug_level = 2;
 int debug_print_time_level = 10;
 int frame_check = 0;
+int line_num = 0;
+int thread_tid = 0;
 int flush_log = 3;
 int timeout_seconds = 600;
 bool lock_all = false;
@@ -884,7 +886,7 @@ void parse_stack_trace(const proc_info& pinfo,
           }
           const proc_map_ent& proc_maps_ent = pinfo.maps[maps_offset];
           const bfd_handle* bh = proc_maps_ent.stbl->bh;
-          if (bh->has_debug() && i < 2) {
+          if (bh->has_debug() && (i < line_num || thread_tid > 0)) {
             int ret;
             ret = bh->get_file_line(
                 rel_addr ? rel_addr : addr, &file, &name, &lineno);
@@ -1185,7 +1187,12 @@ void dump_stack(const thread_list& threads) {
                     threads[i].tid,
                     name_info.c_str());
       }
-      parse_stack_trace(pinfos[i], vals_sps[i], trace_length);
+      if (thread_tid == 0) { // print all
+        parse_stack_trace(pinfos[i], vals_sps[i], trace_length);
+      } else if (thread_tid == threads[i].tid) {
+        // if tid specified, only print the specified info
+        parse_stack_trace(pinfos[i], vals_sps[i], trace_length);
+      }
     }
   }
   if (stack_out_fp) {
@@ -1217,6 +1224,8 @@ struct option long_options[] = {
     {"flush_log", required_argument, nullptr, 'w'},
     {"timeout_seconds", required_argument, nullptr, 'k'},
     {"lock_all", no_argument, nullptr, 'l'},
+    {"thread_id", no_argument, nullptr, 'i'},
+    {"line_num", no_argument, nullptr, 'q'},
     {nullptr, 0, nullptr, 0}};
 
 static void show_version() { printf("quickstack version %s\n", version); }
@@ -1270,6 +1279,12 @@ static void usage_exit() {
       "during parsing all other processes. This will lock the whole process "
       "during taking all stack traces, so stall time is slightly increased, "
       "but will give more accurate results.\n");
+  printf(
+      " -i, --thread_id=TID        :Only print thread TID with full stack info"
+      "Default is print all threads stack with simplified stack info\n");
+  printf(
+      " -q, --line_num=N        :Print top N call stack with line num "
+      "Default is no line number displayed for fast dump\n");
   exit(1);
 }
 
@@ -1329,6 +1344,12 @@ static void get_options(int argc, char** argv) {
       break;
     case 'l':
       lock_all = true;
+      break;
+    case 'i':
+      thread_tid = atoi(optarg);
+      break;
+    case 'q':
+      line_num = atoi(optarg);
       break;
     default:
       usage_exit();
