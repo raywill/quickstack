@@ -10,6 +10,7 @@ quickstack internally scans stack frames and guesses caller functions.
 For 64bit applications, it is highly recommended to build with -fno-omit-frame-pointer.
 
 ## How to build:
+
 * Install binutils 2.22+ and elfutils-libelf-devel
 * Install cmake
 * cmake .
@@ -23,7 +24,7 @@ sudo apt-get install libiberty-dev
 
 ## Direct download:
 
-a prebuild binary is provied in bin/ director, built in Linux version 2.6.32.el6.x86_64 (gcc version 4.4.4 20100726 (Red Hat 4.4.4-13) (GCC) )
+a prebuild binary is provided in `bin/` directory, built under Linux version 2.6.32.el6.x86_64 (gcc version 4.4.4 20100726 (Red Hat 4.4.4-13) (GCC) )
 
 
 ## Example:
