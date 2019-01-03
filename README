@@ -23,6 +23,17 @@ sudo apt-get install libiberty-dev
 
 
 Example:
-[user$] quickstack -f -p `pidof mysqld`
+
+quick print process's all backtrace
+
+[user$] quickstack -p `pidof mysqld`
+
+print specific thread backtrace
+
+[user$] quickstack -p `pidof mysqld` -i=32311
+
+slow (VERY SLOW) print process's all backtrace with top 3 frames with line number
+
+[user$] quickstack -f -p `pidof mysqld` -q 3
 
 License: BSD 3-Clause License
