@@ -44,3 +44,40 @@ slow (VERY SLOW) print process's all backtrace with top 3 frames with line numbe
 ## License:
 
 BSD 3-Clause License
+
+## MISC
+
+For better understanding pstack result, following script `pstack-agg.py` is recommonded:
+
+
+
+```
+#!/usr/bin/env python2
+"""
+# author yuanqi
+quickstack <pid> | pstack-agg.py
+"""
+
+import sys
+import re
+import itertools
+import pprint
+
+def help():
+    print __doc__
+
+if __name__ == '__main__':
+    rexp = '^Thread (\d+).*?\n(.*?)(?=\nThread)'
+    tid_stack_list = re.findall(rexp, sys.stdin.read() + '\nThread', re.M|re.S)
+    key_func = lambda x: x[1]
+    for tid_list, stack_trace in sorted(([[tid for tid, stack in grp], key] for key, grp in itertools.groupby(sorted(tid_stack_list, key = key_func), key_func)), key=lambda x: len(x[0]), reverse=True):
+        print 'TID: %s'%(' '.join(tid_list))
+        print stack_trace
+```
+
+Save above script as pstack-agg.py. Usage:
+
+```
+quickstack <pid> | pstack-agg.py
+```
+
