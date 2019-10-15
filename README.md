@@ -49,35 +49,42 @@ BSD 3-Clause License
 
 For better understanding pstack result, following script `pstack-agg.py` is recommonded:
 
-
-
 ```
-#!/usr/bin/env python2
-"""
-# author yuanqi
-quickstack <pid> | pstack-agg.py
-"""
-
+python -c '
 import sys
-import re
-import itertools
-import pprint
+with open(sys.argv[1]) as f:
+    s = f.read()
+pstack = {}
+v = ""
+k = ""
+t = ""
+start = False
+for l in s.splitlines(True):
+    if start and l.startswith("#"):
+        k += l.split()[1]
+        v += l
+    elif start and l.startswith("Thread"):
+        if k in pstack:
+            pstack[k][0].append(t)
+        else:
+            pstack[k] = [[t], v]
+        t = l.split()[-1][:-3]
+        v = ""
+        k = ""
+    elif not start and l.startswith("Thread "):
+        t = l.split()[-1][:-3]
+        v = ""
+        k = ""
+        start = True
+if k in pstack:
+    pstack[k][0].append(t)
+else:
+    pstack[k] = [[t], v]
 
-def help():
-    print __doc__
-
-if __name__ == '__main__':
-    rexp = '^Thread (\d+).*?\n(.*?)(?=\nThread)'
-    tid_stack_list = re.findall(rexp, sys.stdin.read() + '\nThread', re.M|re.S)
-    key_func = lambda x: x[1]
-    for tid_list, stack_trace in sorted(([[tid for tid, stack in grp], key] for key, grp in itertools.groupby(sorted(tid_stack_list, key = key_func), key_func)), key=lambda x: len(x[0]), reverse=True):
-        print 'TID: %s'%(' '.join(tid_list))
-        print stack_trace
+res = pstack.values()
+res.sort(key=lambda x: len(x[0]))
+for v in res:
+    print len(v[0]), v[0]
+    print v[1]
+'  pstack_output.stack > aggregated_output.stack
 ```
-
-Save above script as pstack-agg.py. Usage:
-
-```
-quickstack <pid> | pstack-agg.py
-```
-
